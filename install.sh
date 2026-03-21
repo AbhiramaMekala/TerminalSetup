@@ -194,3 +194,6 @@ echo ""
 echo "✅ DONE!"
 echo "👉 Restart terminal"
 echo "👉 Set terminal font to: MesloLGS NF"
+
+zsh
+source ~/.zshrc
