@@ -152,15 +152,18 @@ EOF
 # -------------------------
 # Preconfigured p10k
 # -------------------------
-setup_p10k_config() {
-  if [ ! -f "$HOME/.p10k.zsh" ]; then
-    echo "⚡ Applying preconfigured Powerlevel10k..."
 
-    curl -fsSL https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.zsh \
-      -o "$HOME/.p10k.zsh"
-  else
-    echo "✔ p10k config already exists"
+setup_p10k_config() {
+  echo "⚡ Applying your custom Powerlevel10k config..."
+
+  # Backup if exists
+  if [ -f "$HOME/.p10k.zsh" ]; then
+    cp "$HOME/.p10k.zsh" "$HOME/.p10k.zsh.backup.$(date +%s)"
   fi
+
+  # Download YOUR config from GitHub
+  curl -fsSL https://raw.githubusercontent.com/AbhiramaMekala/TerminalSetup/main/p10k.zsh \
+    -o "$HOME/.p10k.zsh"
 }
 
 # -------------------------
