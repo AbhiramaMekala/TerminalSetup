@@ -128,10 +128,17 @@ install_nerd_font() {
     FONT_DIR="$HOME/.local/share/fonts"
   fi
 
-  if fc-list 2>/dev/null | grep -iq "JetBrainsMono Nerd Font"; then
+  if [[ "$OS" == "Darwin" ]]; then
+  if find "$HOME/Library/Fonts" -iname "*JetBrainsMono*" | grep -q .; then
     echo "✅ JetBrainsMono Nerd Font already installed."
     return
   fi
+else
+  if command_exists fc-list && fc-list | grep -iq "JetBrainsMono Nerd Font"; then
+    echo "✅ JetBrainsMono Nerd Font already installed."
+    return
+  fi
+fi
 
   echo "⬇️ Installing JetBrainsMono Nerd Font..."
 
@@ -268,9 +275,8 @@ set_shell
 
 echo ""
 echo "✅ DONE!"
-echo "👉 Restart Recommended"
+#echo "👉 Restart Terminal"
 echo "👉 Recommended font: JetBrainsMono Nerd Font"
 echo "👉 Fallback font: MesloLGS NF"
 
-zsh
-source ~/.zshrc
+exec zsh
