@@ -62,26 +62,101 @@ install_deps() {
 }
 
 # -------------------------
-# Nerd Font install
+# Nerd Font install (Meslo)
 # -------------------------
 install_font() {
   echo "🔤 Installing Meslo Nerd Font..."
 
-  FONT_DIR="$HOME/.local/share/fonts"
+  # OS-specific font directory
+  if [[ "$OS" == "Darwin" ]]; then
+    FONT_DIR="$HOME/Library/Fonts"
+  else
+    FONT_DIR="$HOME/.local/share/fonts"
+  fi
+
   mkdir -p "$FONT_DIR"
 
-  if ! ls "$FONT_DIR" | grep -qi "Meslo"; then
-    wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -O "$FONT_DIR/MesloLGS NF Regular.ttf"
-    wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf -O "$FONT_DIR/MesloLGS NF Bold.ttf"
-    wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -O "$FONT_DIR/MesloLGS NF Italic.ttf"
-    wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -O "$FONT_DIR/MesloLGS NF Bold Italic.ttf"
-
-    if command_exists fc-cache; then
-      fc-cache -fv
-    fi
-  else
-    echo "✔ Font already installed"
+  # Better check using fc-list (if available)
+  if command_exists fc-list && fc-list | grep -iq "MesloLGS NF"; then
+    echo "✔ Meslo Nerd Font already installed"
+    return
   fi
+
+  download() {
+    URL=$1
+    OUTPUT=$2
+
+    if command_exists wget; then
+      wget -q "$URL" -O "$OUTPUT"
+    else
+      curl -fsSL "$URL" -o "$OUTPUT"
+    fi
+  }
+
+  download https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf \
+    "$FONT_DIR/MesloLGS NF Regular.ttf"
+
+  download https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf \
+    "$FONT_DIR/MesloLGS NF Bold.ttf"
+
+  download https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf \
+    "$FONT_DIR/MesloLGS NF Italic.ttf"
+
+  download https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf \
+    "$FONT_DIR/MesloLGS NF Bold Italic.ttf"
+
+  # Refresh cache (Linux only)
+  if command_exists fc-cache; then
+    fc-cache -fv >/dev/null
+  fi
+
+  echo "🎉 Meslo Nerd Font installed successfully."
+}
+
+# -------------------------
+# JetBrainsMono Nerd Font install
+# -------------------------
+install_nerd_font() {
+  FONT_NAME="JetBrainsMono Nerd Font"
+  FONT_ZIP="JetBrainsMono.zip"
+  FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
+
+  # OS-specific font directory
+  if [[ "$OS" == "Darwin" ]]; then
+    FONT_DIR="$HOME/Library/Fonts"
+  else
+    FONT_DIR="$HOME/.local/share/fonts"
+  fi
+
+  if fc-list 2>/dev/null | grep -iq "JetBrainsMono Nerd Font"; then
+    echo "✅ JetBrainsMono Nerd Font already installed."
+    return
+  fi
+
+  echo "⬇️ Installing JetBrainsMono Nerd Font..."
+
+  mkdir -p "$FONT_DIR"
+
+  TMP_DIR="$(mktemp -d)"
+  ZIP_PATH="$TMP_DIR/$FONT_ZIP"
+
+  if command_exists wget; then
+    wget -q "$FONT_URL" -O "$ZIP_PATH"
+  else
+    curl -L "$FONT_URL" -o "$ZIP_PATH"
+  fi
+
+  unzip -q "$ZIP_PATH" -d "$TMP_DIR"
+  find "$TMP_DIR" -type f -iname "*.ttf" -exec cp {} "$FONT_DIR" \;
+
+  rm -rf "$TMP_DIR"
+
+  # Refresh font cache ONLY on Linux
+  if command_exists fc-cache; then
+    fc-cache -fv >/dev/null
+  fi
+
+  echo "🎉 JetBrainsMono Nerd Font installed successfully."
 }
 
 # -------------------------
@@ -183,6 +258,7 @@ set_shell() {
 # -------------------------
 install_deps
 install_font
+install_nerd_font
 install_ohmyzsh
 install_p10k
 install_plugins
