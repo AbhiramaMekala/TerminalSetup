@@ -268,8 +268,9 @@ set_shell
 
 echo ""
 echo "✅ DONE!"
-echo "👉 Restart terminal"
-echo "👉 Set terminal font to: MesloLGS NF"
+echo "👉 Restart Recommended"
+echo "👉 Recommended font: JetBrainsMono Nerd Font"
+echo "👉 Fallback font: MesloLGS NF"
 
 zsh
 source ~/.zshrc
